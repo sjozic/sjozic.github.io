@@ -11,5 +11,12 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(500, 0, 0);
 }
+
+function stampShape() {
+  if keyPressed() && key === a {
+    ellipse(56, 46, 55, 55);
+  }
+}
+
