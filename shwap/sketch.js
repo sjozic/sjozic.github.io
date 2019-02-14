@@ -11,12 +11,20 @@ function setup() {
 }
 
 function draw() {
-  background(500, 0, 0);
+  fill(255);
+  rect(55, 55, 55, 55);
 }
 
-function stampShape() {
-  if keyPressed() && key === a {
-    ellipse(56, 46, 55, 55);
+function keyPressed() {
+  fill(random(0,255), random(0, 255), random(0,255));
+  if (key === "s") {
+    ellipse(random(0, windowWidth), random(0, windowHeight), random(20, 100), random(20, 100));
+  }
+  if (key === "a") {
+    rect(random(0, windowWidth), random(0, windowHeight), random(20, 90), random(20, 90));
+  }
+  if (key === "d") {
+    triangle(random(0, windowWidth), random(0, windowHeight), random(0, windowWidth), random(0, windowHeight), random(0, windowWidth), random(0, windowHeight));
   }
 }
 
