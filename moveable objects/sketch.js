@@ -25,12 +25,16 @@ function draw() {
       mouseOver = true;
     }
   }
+  if (pickedUp === true) {
+    x = mouseX;
+    y = mouseY;
+  }
   rect(x, y, rSize, rSize);
 }
 
 function mousePressed() {
   if (mouseOver === true) {
-    pickedUp === true;
+    pickedUp = true;
   }
 }
 
