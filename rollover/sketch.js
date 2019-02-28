@@ -8,10 +8,10 @@
 let fadeIn;
 let quadrant;
 
-let fill1 = (0);
-let fill2 = (0);
-let fill3 = (0);
-let fill4 = (0);
+let fill1 = 0; //top left
+let fill2 = 0; //bottom left
+let fill3 = 0; //top right
+let fill4 = 0; //bottom right
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -21,8 +21,8 @@ function setup() {
 
 //mouse tracking function-----------------
 function determineQuadrant() {
-  if (mouseX < width/2) {//left side
-    if (mouseY < height/2) {//top side
+  if (mouseX < width/2) { 
+    if (mouseY < height/2) {
       quadrant = 1;
     }
     else{
@@ -41,55 +41,55 @@ function determineQuadrant() {
 //-----------------------------------------
 function fillChange(){
 
-  //QUADRANT 1
+  //QUADRANT 1 (top left)
   if(quadrant === 1) {
     if(fill1 < 255){
       fill1 = fill1 += 5;
-      }
     }
+  }
   else {
     if (fill1 > 0){
-    fill1 = fill1 -= 5;
+      fill1 = fill1 -= 5;
     }
   }
 
-  //QUADRANT 2
+  //QUADRANT 2 (bottom left)
   if(quadrant === 2) {
     if(fill2 < 255){
       fill2 = fill2 += 5;
-      }
     }
+  }
   else {
     if (fill2 > 0){
-    fill2 = fill2 -= 5;
-      }
+      fill2 = fill2 -= 5;
     }
+  }
 
-  //QUADRANT 3
+  //QUADRANT 3 (top right)
   if(quadrant === 3) {
     if(fill3 < 255){
       fill3 = fill3 += 5;
-      }
     }
+  }
   else {
     if (fill3 > 0){
-    fill3 = fill3 -= 5;
-      }
+      fill3 = fill3 -= 5;
     }
+  }
 
-  //QUADRANT 4
+  //QUADRANT 4 (top left)
   if(quadrant === 4) {
     if(fill4 < 255){
       fill4 = fill4 += 5;
-      }
     }
+  }
   else {
     if (fill4 > 0){
-    fill4 = fill4 -= 5;
-      }
+      fill4 = fill4 -= 5;
     }
-
   }
+
+}
 //-----------------------------------------
 function drawSquares(){
   rectMode(CENTER);
@@ -100,7 +100,7 @@ function drawSquares(){
   rect(width/4, height/4, width/2, height/2);
 
   fill(fill2);
-  rect(width/4, (height-height/4), width/2, height/2);
+  rect(width/4, height-height/4, width/2, height/2);
 
   fill (fill3);
   rect(width-width/4, height/4, width/2, height/2);
