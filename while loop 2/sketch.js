@@ -34,10 +34,10 @@ function drawTargetWhile(){
 function drawTargetFor(){ 
   for (let i = 200; i > 0; i--){
     if (color === true){
-      fill(random(0, 255), random(0, 255), random(0, 255));
+      fill(0);
     }
     else {
-      fill(0);
+      fill(255);
     }
     ellipse(width/2, height/2, i*50, i*50);
     color = !color;
