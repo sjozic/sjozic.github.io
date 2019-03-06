@@ -9,6 +9,7 @@ let fillA, fillB, fillC;
 let sizeA, sizeB;
 let radio;
 let picker;
+let colorBefore, colorAfter;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -40,7 +41,7 @@ function setup() {
   print(radio.value());
 
   picker = createColorPicker();
-  picker.position(10, 125)
+  picker.position(10, 125);
 }
 
 function draw() {
