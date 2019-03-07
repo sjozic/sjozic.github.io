@@ -7,7 +7,7 @@
 
 let positionX = 0;
 let positionY = 0;
-let color = false;
+let rectSize = 15.75;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -15,22 +15,32 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  colorGrid();
+}
 
+function mousePressed(){
+  if (mouseButton === LEFT){
+    rectSize = rectSize + 0.5;
+    colorGrid();
+  }
+  if (mouseButton === RIGHT){
+    print('oof');
+    rectSize = rectSize - 0.5;
+    colorGrid();
+  }
+  
+}
+
+function colorGrid(){
+  positionX = 0;
+  positionY = 0;
   for (let i = 0; i < width; i ++) {
 
-    if (color === true) {
-      color = (255);
-    }
-    else {
-      color = (0);
-    }
-    fill(color);
-    color = !color;
-    rect(positionX, positionY, 20, 20);
-    positionX = positionX + 20;
-    if (positionX === width) {
-      positionY = positionY + 20;
+    fill(random(255), random(255), random(255));
+    rect(positionX, positionY, rectSize, rectSize);
+    positionX = positionX + rectSize;
+    if (positionX >= width) {
+      positionY = positionY + rectSize;
       positionX = 0;
     }
   }
