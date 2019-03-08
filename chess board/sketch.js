@@ -15,6 +15,7 @@ function setup() {
 }
 
 function draw() {
+  strokeWeight(0);
   colorGrid();
 }
 
@@ -24,7 +25,6 @@ function mousePressed(){
     colorGrid();
   }
   if (mouseButton === RIGHT){
-    print('oof');
     rectSize = rectSize - 0.5;
     colorGrid();
   }
@@ -34,9 +34,9 @@ function mousePressed(){
 function colorGrid(){
   positionX = 0;
   positionY = 0;
-  for (let i = 0; i < width; i ++) {
+  for (let i = 0; i < width * height; i ++) {
 
-    fill(random(255), random(255), random(255));
+    fill(0, 0, random(255));
     rect(positionX, positionY, rectSize, rectSize);
     positionX = positionX + rectSize;
     if (positionX >= width) {
@@ -44,4 +44,8 @@ function colorGrid(){
       positionX = 0;
     }
   }
+}
+
+function keyPressed() {
+  colorGrid();
 }
