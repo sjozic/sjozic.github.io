@@ -20,6 +20,7 @@ function draw() {
 }
 
 function mousePressed(){
+  background(255);
   if (mouseButton === LEFT){
     rectSize = rectSize + 0.5;
     colorGrid();
@@ -36,7 +37,7 @@ function colorGrid(){
   positionY = 0;
   for (let i = 0; i < width * height; i ++) {
 
-    fill(0, 0, random(255));
+    fill(0, 0, random(255), random(255));
     rect(positionX, positionY, rectSize, rectSize);
     positionX = positionX + rectSize;
     if (positionX >= width) {
