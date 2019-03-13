@@ -8,6 +8,7 @@
 let positionX = 0;
 let positionY = 0;
 let rectSize = 15.75;
+let moveX = 0.0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -37,7 +38,10 @@ function colorGrid(){
   positionY = 0;
   for (let i = 0; i < width * height; i ++) {
 
-    fill(0, 0, random(255), random(255));
+    moveX = moveX + 0.1;
+    let n = noise(moveX) * width;
+
+    fill(0, 0, n, n);
     rect(positionX, positionY, rectSize, rectSize);
     positionX = positionX + rectSize;
     if (positionX >= width) {
