@@ -5,7 +5,8 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-
+let start = 0;
+let inc = 0.002;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -14,21 +15,43 @@ function setup() {
 }
 
 function draw() {
+  background(51);
+  stroke(255);
+  noFill();
+  beginShape();
+  let xOff = start;
+  let x = 0;
+  for (let x = 0; x <= width; x++) {
+    stroke(255);
+    let y = noise(xOff) * height;
+    vertex(x, y);
+  
+    xOff += inc;
+  }
+  endShape();
+  
 
+  start += inc;
 }
 
 
 function generateTerrain() {
 
-  let yOff = 0;
+  background(51);
+  stroke(255);
+  noFill();
+  beginShape();
+  let xOff = start;
   let x = 0;
-  for (let i = 0; i <= width; i++) {
-    let y = map(noise(yOff), 0, 1, 0, height);
-    yOff -= 0.01;
+  for (let x = 0; x <= width; x++) {
+    stroke(255);
+    let y = noise(xOff) * height;
+    vertex(x, y);
 
-    fill(0);
-    //fill(0);
-    rect(x, y, 0.1, height - y); x += 1;
+    xOff += inc;
   }
+  endShape();
+
+  start += inc;
 }
   
