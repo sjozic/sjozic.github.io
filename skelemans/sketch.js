@@ -5,7 +5,8 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let skeleUp = [];
+let skeleVert = [];
+let skeleR = [];
 let pngNum = 1;
 let currentSkele = 0; 
 let speed;
@@ -20,13 +21,19 @@ function setup() {
 
 function preload() {
   for (let i = 0; i < 3; i ++) {
-    skeleUp.push(loadImage("assets/skeleton sprites/skele-0" + pngNum + ".png"));
+    skeleVert.push(loadImage("assets/skeleton sprites/skeleUpAndIdle/skele-0" + pngNum + ".png"));
+    pngNum ++;
+  }
+
+  pngNum = 1;
+
+  for (let i = 1; i < 4; i++) {
+    skeleR.push(loadImage("assets/skeleton sprites/skeleR/skeleR-0" + pngNum + ".png"));
     pngNum ++;
   }
 }
 
 function draw() {
-  scale(2);
   background(0);
   keyPressed();
 }
@@ -35,24 +42,28 @@ function draw() {
 function keyPressed(){
   if (keyIsPressed && keyCode === UP_ARROW){
     skeleY = skeleY - 1;
-    skeletonUpAnim();
+    skeletonVerticleAnim();
   }
 
   else if (keyIsPressed && keyCode === DOWN_ARROW){
     skeleY = skeleY + 1;
-    skeletonUpAnim();
+    skeletonVerticleAnim();
   }
+
+  else if (keyIsPressed && keyCode === RIGHT_ARROW){
+    skeleX = skeleX + 1;
+    skeletonRightAnim();
+  }
+
   else {
     skeleStill();
-    skeleY = skeleY;
-    skeleX = skeleX;
   }
 }
 
 
-function skeletonUpAnim() {
-  image(skeleUp[currentSkele], skeleX, skeleY)
-  if (frameCount % 4 === 0){
+function skeletonVerticleAnim() {
+  image(skeleVert[currentSkele], skeleX, skeleY);
+  if (frameCount % 5 === 0){
     currentSkele ++;
     print(currentSkele);
   }
@@ -61,6 +72,25 @@ function skeletonUpAnim() {
   }
 }
 
+
+function skeletonRightAnim() {
+  image(skeleR[currentSkele], skeleX, skeleY);
+  if (frameCount % 5 === 0){
+    currentSkele ++;
+    print(currentSkele);
+  }
+  if (currentSkele >= 3) {
+    currentSkele = 0;
+  }
+}
+
+
 function skeleStill() {
-  image(skeleUp[0], skeleX, skeleY)
+  image(skeleVert[currentSkele], skeleX, skeleY);
+  if (frameCount % 20 === 0) {
+    currentSkele ++;
+  }
+  if (currentSkele >= 2) {
+    currentSkele = 0;
+  }
 }
