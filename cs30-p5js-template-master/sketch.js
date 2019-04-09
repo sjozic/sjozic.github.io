@@ -6,7 +6,7 @@
 // - describe what you did to take this project "above and beyond"
 
 
-let squareSize = 15;
+let squareSize = 75;
 
 function setup() {
   noFill();
