@@ -10,12 +10,11 @@ let skeleR = [];
 let skeleIdle = [];
 let pngNum = 1;
 let currentSkele = 0;
-let speed;
 let skeleX = 100;
 let skeleY = 100;
 let reverse = false;
 let lock = false;
-let skeleFall = [];
+let skeleL = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -45,10 +44,11 @@ function preload() {
 
   pngNum = 1;
 
-  for (let i = 1; i < 10; i++) {
-    skeleFall.push(loadImage("assets/skeleton sprites/skeleFall/skeleFall-0" + pngNum + ".png"));
+  for (let i = 1; i < 4; i++) {
+    skeleL.push(loadImage("assets/skeleton sprites/skeleL/skeleL-0" + pngNum + ".png"));
     pngNum++;
   }
+
 }
 
 function draw() {
@@ -73,10 +73,10 @@ function keyPressed() {
     skeletonRightAnim();
   }
 
-  else if (keyIsPressed && keyCode === 32) {
-    skeletonFallAnim();
+  else if (keyIsPressed && keyCode === LEFT_ARROW) {
+    skeleX = skeleX - 1;
+    skeletonLeftAnim();
   }
-
 
   else {
     skeleStill();
@@ -86,7 +86,7 @@ function keyPressed() {
 
 function skeletonVerticleAnim() {
 
-  if (currentSkele >= 3){
+  if (currentSkele >= 3) {
     currentSkele = 0;
   }
 
@@ -103,7 +103,7 @@ function skeletonVerticleAnim() {
 
 function skeletonRightAnim() {
 
-  if (currentSkele >= 3){
+  if (currentSkele >= 3) {
     currentSkele = 0;
   }
 
@@ -114,7 +114,7 @@ function skeletonRightAnim() {
     currentSkele++;
   }
   if (currentSkele >= 3) {
-    currentSkele = 0
+    currentSkele = 0;
   }
 }
 
@@ -145,11 +145,19 @@ function skeleStill() {
 
 }
 
+function skeletonLeftAnim(){
 
+  if (currentSkele >= 3) {
+    currentSkele = 0;
+  }
 
-function skeletonFallAnim() {
-  currentSkele = 1;
-  for (currentSkele; currentSkele < 9; currentSkele ++){
-    image(skeleFall[currentSkele], skeleX, skeleY);
+  print(currentSkele);
+  image(skeleL[currentSkele], skeleX, skeleY);
+
+  if (frameCount % 5 === 0) {
+    currentSkele++;
+  }
+  if (currentSkele >= 3) {
+    currentSkele = 0;
   }
 }
