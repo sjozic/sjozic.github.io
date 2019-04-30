@@ -11,18 +11,23 @@ let colors = ["#D3BE7C", "#CDA185", "#C8848E", "#C26796", "#BC4A9F", "#C9A918", 
 
 
 function setup() {
-  createCanvas(windowWidth, windowHeight+5);
+  createCanvas(3000, 4500);
   noLoop();
   stroke(0.01);
 }
 
 function draw() {
   colorMode(HSB);
-  background(0);
+  //background(0);
   for (yRange = 0; yRange < height; yRange ++){
     for (xRange = 0; xRange < width; xRange ++){
-      fill(colors[int(random(colors.length))]);
-      rect(random(0, xRange), yRange, random(10),random(50));
+      rotate(radians(random(10, 90)))
+      //fill(colors[int(random(colors.length))]);
+      rect(random(xRange, xRange*3000), yRange, random(10),random(50));
     }
   }
+}
+
+function mouseClicked(){
+  save();
 }
