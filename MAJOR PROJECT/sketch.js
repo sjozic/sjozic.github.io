@@ -5,6 +5,11 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 let mousePos;
+let multiplier = 20;
+let collisionSide;
+let airborn = false;
+let wallTypes = ['norm'];
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -15,15 +20,17 @@ function setup() {
 
 function draw() {
   background(255);
-  colCheck();
   player.display();
   player.move();
-  wall.display();
+  windowWallCollsion();
 }
 
 function mouseClicked(){
-  mousePos = createVector(mouseX, mouseY);
-  player.findVelocity();
+  if (airborn === false){
+    mousePos = createVector(mouseX, mouseY);
+    player.findVelocity();
+    airborn = true;
+  }
 }
 
 class playerBox{
@@ -41,7 +48,9 @@ class playerBox{
 
   findVelocity(){
     this.velocity = p5.Vector.sub(mousePos, this.position);
-    //this.velocity.mult(0.05);
+    this.velocity.normalize();
+    this.velocity.mult(multiplier);
+    
   }
 
   move(){
@@ -50,20 +59,56 @@ class playerBox{
 }
 
 
-class Wall{
-  constructor(){
-    this.position = createVector(90, 90);
-    this.height = random(height);
+
+
+function windowWallCollsion(){
+  if (player.position.x - player.size/2 <= 0 || player.position.x + player.size/2 >= width || player.position.y - player.size/2 <= 0 || player.position.y + player.size/2 > height){
+    player.velocity = 0;
+    airborn = false;
   }
 
-  display(){
-    fill(0, 255, 0);
-    rect(this.position.x, this.position.y, 20, this.height);
+  if (player.position.x + player.size/2 > width){
+    player.position.x = width - player.size/2;
+    collisionSide = 1;
+  }
+  else if (player.position.x - player.size/2 < 0){
+    player.position.x = 0 + player.size/2;
+    collisionSide = 2;
+  }
+  else if (player.position.y + player.size/2 > height){
+    player.position.y = height - player.size/2;
+    collisionSide = 3;
+  }
+  else if (player.position.y - player.size/2 < 0){
+    player.position.y = 0 + player.size/2;
+    collisionSide = 4;
+  }
+  else {
+    collisionSide = 0;
+  }
+
+  if (collisionSide > 0){
+    dustCloud();
   }
 }
 
-function colCheck(){
-  let d = dist(player.position.x, player.position.y, wall.position.x, wall.position.y);
-  print(d);
-  if (player.position.x-player.size )
+
+function dustCloud(){
+  //
+}
+
+
+
+class Wall{
+  constructor(){
+    this.position = (random(width*height));
+    this.type = (wallTypes[random()]);
+    this.rotation = (random(0, 1));
+  }
+
+
+
+
+
+
 }
