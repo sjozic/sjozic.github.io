@@ -5,7 +5,7 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 let mousePos;
-let multiplier = 20;
+let multiplier = 35;
 let collisionSide;
 let airborn = false;
 let wallTypes = ['norm'];
@@ -23,6 +23,7 @@ function draw() {
   player.display();
   player.move();
   windowWallCollsion();
+  wall.display();
 }
 
 function mouseClicked(){
@@ -101,9 +102,19 @@ function dustCloud(){
 
 class Wall{
   constructor(){
-    this.position = (random(width*height));
+    this.position = createVector(random(width), random(height));
     this.type = (wallTypes[random()]);
-    this.rotation = (random(0, 1));
+    this.rotation = (int(random(1, 3)));
+  }
+
+  display(){
+    fill(0);
+    if (this.rotation === 1){
+      rect(this.position.x, this.position.y, 5, 90);
+    }
+    else {
+      rect(this.position.x, this.position.y, 5, 90);
+    }
   }
 
 
