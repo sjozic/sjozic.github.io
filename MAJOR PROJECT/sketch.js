@@ -13,7 +13,7 @@ let wallTypes = ['norm'];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  rectMode(CENTER);
+  rectMode(CORNER);
   player = new playerBox();
   wall = new Wall();
 }
@@ -24,6 +24,7 @@ function draw() {
   player.move();
   windowWallCollsion();
   wall.display();
+  objectCollision();
 }
 
 function mouseClicked(){
@@ -40,6 +41,7 @@ class playerBox{
     this.velocity = createVector(0, 0);
     this.size = 20;
     this.speed = 30;
+    this.prevPos;
   }
 
   display(){
@@ -55,6 +57,7 @@ class playerBox{
   }
 
   move(){
+    this.prevPos = createVector(this.position.x, this.position.y);
     this.position.add(this.velocity);
   }
 }
@@ -63,25 +66,25 @@ class playerBox{
 
 
 function windowWallCollsion(){
-  if (player.position.x - player.size/2 <= 0 || player.position.x + player.size/2 >= width || player.position.y - player.size/2 <= 0 || player.position.y + player.size/2 > height){
+  if (player.position.x <= 0 || player.position.x + player.size >= width || player.position.y <= 0 || player.position.y + player.size > height){
     player.velocity = 0;
     airborn = false;
   }
 
-  if (player.position.x + player.size/2 > width){
-    player.position.x = width - player.size/2;
+  if (player.position.x + player.size > width){
+    player.position.x = width - player.size;
     collisionSide = 1;
   }
-  else if (player.position.x - player.size/2 < 0){
-    player.position.x = 0 + player.size/2;
+  else if (player.position.x < 0){
+    player.position.x = 0;
     collisionSide = 2;
   }
-  else if (player.position.y + player.size/2 > height){
-    player.position.y = height - player.size/2;
+  else if (player.position.y + player.size > height){
+    player.position.y = height - player.size;
     collisionSide = 3;
   }
-  else if (player.position.y - player.size/2 < 0){
-    player.position.y = 0 + player.size/2;
+  else if (player.position.y < 0){
+    player.position.y = 0;
     collisionSide = 4;
   }
   else {
@@ -105,15 +108,17 @@ class Wall{
     this.position = createVector(random(width), random(height));
     this.type = (wallTypes[random()]);
     this.rotation = (int(random(1, 3)));
+    this.sizeA = 90;
+    this.sizeB = 5;
   }
 
   display(){
     fill(0);
     if (this.rotation === 1){
-      rect(this.position.x, this.position.y, 5, 90);
+      rect(this.position.x, this.position.y, this.sizeA, this.sizeB);
     }
     else {
-      rect(this.position.x, this.position.y, 5, 90);
+      rect(this.position.x, this.position.y, this.sizeB, this.sizeA);
     }
   }
 
@@ -122,4 +127,24 @@ class Wall{
 
 
 
+}
+
+function objectCollision(){
+  wallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, wall.position.x, wall.position.y, wall.sizeA, wall.sizeB);
+  //print(wallHit);
+  if (wallHit === true){
+    if (wall.rotation === 1){
+      player.velocity = 0;
+      if (player.prevPos.y > player.position.y){
+        print('gut');
+        player.position.y = wall.position.y + wall.sizeB + 2;
+        airborn = false;
+      }
+      if (player.prevPos.y < player.position.y){
+        print('gut');
+        player.position.y = wall.position.y - player.size - 2;
+        airborn = false;
+      }
+    }
+  }
 }
