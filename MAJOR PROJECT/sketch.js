@@ -5,10 +5,11 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 let mousePos;
-let multiplier = 35;
+let multiplier = 30;
 let collisionSide;
 let airborn = false;
 let wallTypes = ['norm'];
+let walls = [];
 
 
 function setup() {
@@ -98,7 +99,10 @@ function windowWallCollsion(){
 
 
 function dustCloud(){
-  //
+  if (collisionSide === 3){
+    fill(0);
+    ellipse(player.position.x + player.size/2, player.position.y + player.size, 50, 50);
+  }
 }
 
 
@@ -121,28 +125,37 @@ class Wall{
       rect(this.position.x, this.position.y, this.sizeB, this.sizeA);
     }
   }
-
-
-
-
-
-
 }
 
+
+
 function objectCollision(){
-  wallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, wall.position.x, wall.position.y, wall.sizeA, wall.sizeB);
-  //print(wallHit);
-  if (wallHit === true){
+  horizontalWallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, wall.position.x, wall.position.y, wall.sizeA, wall.sizeB);
+  verticalWallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, wall.position.x, wall.position.y, wall.sizeB, wall.sizeA);
+  if (horizontalWallHit === true){
     if (wall.rotation === 1){
       player.velocity = 0;
       if (player.prevPos.y > player.position.y){
-        print('gut');
         player.position.y = wall.position.y + wall.sizeB + 2;
+        collisionSide = 3;
         airborn = false;
+        dustCloud();
       }
       if (player.prevPos.y < player.position.y){
-        print('gut');
         player.position.y = wall.position.y - player.size - 2;
+        airborn = false;
+      }
+    }
+  }
+  if (verticalWallHit === true){  
+    if (wall.rotation === 2){
+      player.velocity = 0;
+      if (player.prevPos.x > player.position.x){
+        player.position.x = wall.position.x + wall.sizeB + 2;
+        airborn = false;
+      }
+      if (player.prevPos.x < player.position.x){
+        player.position.x = wall.position.x - player.size - 2;
         airborn = false;
       }
     }
