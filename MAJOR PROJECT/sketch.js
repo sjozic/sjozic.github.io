@@ -5,12 +5,12 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 let mousePos;
-let multiplier = 30;
+let multiplier = 15;
 let collisionSide = 0;
 let airborn = false;
 let wallTypes = ['norm'];
 let walls = [];
-const WALL_NUM = 15;
+let wallNum = 10;
 let launchGood = true;
 
 
@@ -18,21 +18,21 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   rectMode(CORNER);
   player = new playerBox();
-  for (let n = 0; n < WALL_NUM; n ++){
-    walls.push(new Wall());
-  }
+  resetLevel();
+  goal = new Goal();
 }
 
 function draw() {
   background(255);
   player.display();
   player.move();
-  windowWallCollsion();
-  objectCollision();
+  goal.display();
   for (let i = 0; i < walls.length; i++){
     walls[i].display();
   }
-  
+  windowWallCollsion();
+  objectCollision();
+  goalCheck();
 }
 
 function mouseClicked(){
@@ -174,6 +174,42 @@ class Wall{
   }
 }
 
+class Goal {
+  constructor(){
+    this.size = 20
+    this.position = createVector(random(width), random(height))
+  }
+
+  display(){
+    fill(255, 255, 0);
+    ellipse(this.position.x, this.position.y, this.size, this.size)
+  }
+}
+
+
+
+
+function goalCheck(){
+  goalTouch = collideRectCircle(player.position.x, player.position.y, player.size, player.size, goal.position.x, goal.position.y, goal.size, goal.size);
+  if (goalTouch === true){
+    resetLevel();
+  }
+}
+
+
+function resetLevel(){
+  walls = [];
+  for (let n = 0; n < wallNum; n ++){
+    walls.push(new Wall());
+  }
+  goal = new Goal();
+  player.position.x = 50;
+  player.position.y = 50;
+  player.velocity = 0;
+  collisionSide = 0;
+  airborn = false;
+  wallNum ++;
+}
 
 
 function objectCollision(){
@@ -184,13 +220,13 @@ function objectCollision(){
       if (walls[j].rotation === 1){
         player.velocity = 0;
         if (player.prevPos.y > player.position.y){
-          player.position.y = walls[j].position.y + walls[j].sizeB + 2;
+          player.position.y = walls[j].position.y + walls[j].sizeB;
           collisionSide = 4;
           airborn = false;
           dustCloud();
         }
         if (player.prevPos.y < player.position.y){
-          player.position.y = walls[j].position.y - player.size - 2;
+          player.position.y = walls[j].position.y - player.size;
           collisionSide = 3;
           airborn = false;
         }
@@ -200,12 +236,12 @@ function objectCollision(){
       if (walls[j].rotation === 2){
         player.velocity = 0;
         if (player.prevPos.x > player.position.x){
-          player.position.x = walls[j].position.x + walls[j].sizeB + 2;
+          player.position.x = walls[j].position.x + walls[j].sizeB;
           collisionSide = 2;
           airborn = false;
         }
         if (player.prevPos.x < player.position.x){
-          player.position.x = walls[j].position.x - player.size - 2;
+          player.position.x = walls[j].position.x - player.size;
           collisionSide = 1;
           airborn = false;
         }
