@@ -6,17 +6,21 @@
 // - describe what you did to take this project "above and beyond"
 let mousePos;
 let multiplier = 30;
-let collisionSide;
+let collisionSide = 0;
 let airborn = false;
 let wallTypes = ['norm'];
 let walls = [];
+const WALL_NUM = 15;
+let launchGood = true;
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   rectMode(CORNER);
   player = new playerBox();
-  wall = new Wall();
+  for (let n = 0; n < WALL_NUM; n ++){
+    walls.push(new Wall());
+  }
 }
 
 function draw() {
@@ -24,15 +28,65 @@ function draw() {
   player.display();
   player.move();
   windowWallCollsion();
-  wall.display();
   objectCollision();
+  for (let i = 0; i < walls.length; i++){
+    walls[i].display();
+  }
+  
 }
 
 function mouseClicked(){
   if (airborn === false){
     mousePos = createVector(mouseX, mouseY);
-    player.findVelocity();
-    airborn = true;
+
+    if (collisionSide === 4){
+      if (mouseY < player.position.y+player.size){
+        print("bad");
+      }
+      else {
+        player.findVelocity();
+        airborn = true;
+      }
+    }
+
+
+    if (collisionSide === 3){
+      if (mouseY > player.position.y){
+        print("bad");
+      }
+      else {
+        player.findVelocity();
+        airborn = true;
+      }
+    }
+
+
+    if (collisionSide === 2){
+      if (mouseX < player.position.x+player.size){
+        print("bad");
+      }
+      else {
+        player.findVelocity();
+        airborn = true;
+      }
+    }
+
+
+    if (collisionSide === 1){
+      if (mouseX > player.position.x){
+        print("bad");
+      }
+      else {
+        player.findVelocity();
+        airborn = true;
+      }
+    }
+
+
+    if (collisionSide === 0) {
+      player.findVelocity();
+      airborn = true;
+    }
   }
 }
 
@@ -88,13 +142,6 @@ function windowWallCollsion(){
     player.position.y = 0;
     collisionSide = 4;
   }
-  else {
-    collisionSide = 0;
-  }
-
-  if (collisionSide > 0){
-    dustCloud();
-  }
 }
 
 
@@ -113,7 +160,7 @@ class Wall{
     this.type = (wallTypes[random()]);
     this.rotation = (int(random(1, 3)));
     this.sizeA = 90;
-    this.sizeB = 5;
+    this.sizeB = 10;
   }
 
   display(){
@@ -130,33 +177,38 @@ class Wall{
 
 
 function objectCollision(){
-  horizontalWallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, wall.position.x, wall.position.y, wall.sizeA, wall.sizeB);
-  verticalWallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, wall.position.x, wall.position.y, wall.sizeB, wall.sizeA);
-  if (horizontalWallHit === true){
-    if (wall.rotation === 1){
-      player.velocity = 0;
-      if (player.prevPos.y > player.position.y){
-        player.position.y = wall.position.y + wall.sizeB + 2;
-        collisionSide = 3;
-        airborn = false;
-        dustCloud();
-      }
-      if (player.prevPos.y < player.position.y){
-        player.position.y = wall.position.y - player.size - 2;
-        airborn = false;
+  for (let j = 0; j < walls.length; j++){
+    horizontalWallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, walls[j].position.x, walls[j].position.y, walls[j].sizeA, walls[j].sizeB);
+    verticalWallHit = collideRectRect(player.position.x, player.position.y, player.size, player.size, walls[j].position.x, walls[j].position.y, walls[j].sizeB, walls[j].sizeA);
+    if (horizontalWallHit === true){
+      if (walls[j].rotation === 1){
+        player.velocity = 0;
+        if (player.prevPos.y > player.position.y){
+          player.position.y = walls[j].position.y + walls[j].sizeB + 2;
+          collisionSide = 4;
+          airborn = false;
+          dustCloud();
+        }
+        if (player.prevPos.y < player.position.y){
+          player.position.y = walls[j].position.y - player.size - 2;
+          collisionSide = 3;
+          airborn = false;
+        }
       }
     }
-  }
-  if (verticalWallHit === true){  
-    if (wall.rotation === 2){
-      player.velocity = 0;
-      if (player.prevPos.x > player.position.x){
-        player.position.x = wall.position.x + wall.sizeB + 2;
-        airborn = false;
-      }
-      if (player.prevPos.x < player.position.x){
-        player.position.x = wall.position.x - player.size - 2;
-        airborn = false;
+    if (verticalWallHit === true){  
+      if (walls[j].rotation === 2){
+        player.velocity = 0;
+        if (player.prevPos.x > player.position.x){
+          player.position.x = walls[j].position.x + walls[j].sizeB + 2;
+          collisionSide = 2;
+          airborn = false;
+        }
+        if (player.prevPos.x < player.position.x){
+          player.position.x = walls[j].position.x - player.size - 2;
+          collisionSide = 1;
+          airborn = false;
+        }
       }
     }
   }
