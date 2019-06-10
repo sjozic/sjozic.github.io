@@ -1,5 +1,6 @@
 // MAJOR PROJECT
 
+
 //VARIABLE SHINDIGGERY
 let mousePos;
 //SPEED MULTIPLIER
@@ -9,13 +10,17 @@ let collisionSide = 0;
 //WHETHER OR NO THE PLAYER IS AIRBORN
 let airborn = false;
 //ALL THE DIFFERENT TYPES OF WALLS
-let wallTypes = ['norm', 'kill', 'ice'];
+let wallTypes = ['norm', 'kill'];
 //VARIABLE KEEPING IN TRACK OF ALL WALLS IN THE LEVEL
 let walls = [];
 //AMOUNT OF WALLS IN THE LEVEL
 let wallNum = 10;
 //WHETHER OR NOT THE PLAYER CAN JUMP
 let launchGood = true;
+//HOLDS ALL OF THE DUST
+let dusts = [];
+
+let wallAdd = 10;
 
 //INITIAL SETUP (CANVAS, FIRST LEVEL, PLAYER, AND GOAL)
 function setup() {
@@ -37,7 +42,32 @@ function draw() {
   }
   windowWallCollsion();
   objectCollision();
+  for (let d = 0; d < dusts.length; d++) {
+    dusts[d].display();
+    dusts[d].move();
+  }
   goalCheck();
+  trajectory();
+}
+
+
+function trajectory(){
+  let a = mouseX;
+  let b = player.position.x;
+  let c = lerp(a, b, 0.2);
+  let d = lerp(a, b, 0.5);
+  let e = lerp(a, b, 0.8);
+
+  let y = mouseY;
+
+  push();
+  strokeWeight(5);
+  point(b, b);
+  point(b, b);
+  point(c, y);
+  point(d, y);
+  point(e, y);
+  pop();
 }
 
 
@@ -53,6 +83,7 @@ function mouseClicked() {
       }
       else {
         player.findVelocity();
+        collisionSide = 0;
         airborn = true;
       }
     }
@@ -64,6 +95,7 @@ function mouseClicked() {
       }
       else {
         player.findVelocity();
+        collisionSide = 0;
         airborn = true;
       }
     }
@@ -75,6 +107,7 @@ function mouseClicked() {
       }
       else {
         player.findVelocity();
+        collisionSide = 0;
         airborn = true;
       }
     }
@@ -86,6 +119,7 @@ function mouseClicked() {
       }
       else {
         player.findVelocity();
+        collisionSide = 0;
         airborn = true;
       }
     }
@@ -128,6 +162,41 @@ class playerBox {
 }
 
 
+//DEATH EXPLOSION CUBES
+class DustParticle {
+  constructor() {
+    this.position = createVector(0);
+    this.size = 10;
+    this.transparency = 50;
+    this.velocity = 0;
+  }
+
+  display() {
+    fill(200, 200, 200, this.transparency);
+    if (collisionSide === 4) {
+      this.position = createVector(player.position.x + player.size / 2, player.position.y);
+      ellipse(this.position.x, this.position.y, this.size, this.size);
+    }
+    if (collisionSide === 3) {
+      this.position = createVector(player.position.x + player.size / 2, player.position.y + player.size);
+      ellipse(this.position.x, this.position.y, this.size, this.size);
+    }
+    if (collisionSide === 2) {
+      this.position = createVector(player.position.x, player.position.y + player.size / 2);
+      ellipse(this.position.x, this.position.y, this.size, this.size);
+    }
+    if (collisionSide === 1) {
+      this.position = createVector(player.position.x + player.size, player.position.y + player.size / 2);
+      ellipse(this.position.x, this.position.y, this.size, this.size);
+    }
+  }
+
+  move() {
+    this.position.x -20;
+  }
+}
+
+
 
 //KILLS MOMENTUM AND CORRECTS POSITION WHEN RUNNING INTO EDGES OF THE WINDOW, ALSO KEEPS TRACK OF WHICH SIDE OF PLAYER COLLIDED WITH IT
 function windowWallCollsion() {
@@ -141,27 +210,38 @@ function windowWallCollsion() {
     player.position.x = width - player.size;
     //LEFT SIDE OF WINDOW
     collisionSide = 1;
+    dustCloud();
   }
   else if (player.position.x < 0) {
     player.position.x = 0;
     //RIGHT SIDE OF WINDOW
     collisionSide = 2;
+    dustCloud();
   }
   else if (player.position.y + player.size > height) {
     player.position.y = height - player.size;
     //BOTTOM SIDE OF WINDOW
     collisionSide = 3;
+    dustCloud();
   }
   else if (player.position.y < 0) {
     player.position.y = 0;
     //TOP SIDE OF WINDOW
     collisionSide = 4;
+    dustCloud();
   }
 }
 
 
 function dustCloud() {
-  //
+  if (collisionSide > 0) {
+    for (let l = 0; l < 20; l++) {
+      dusts.push(new DustParticle);
+    }
+  }
+  else {
+    dusts = [];
+  }
 }
 
 
@@ -233,7 +313,8 @@ function resetLevel() {
   player.velocity = 0;
   collisionSide = 0;
   airborn = false;
-  wallNum++;
+  wallNum += wallAdd;
+  wallAdd++;
 }
 
 
@@ -260,6 +341,7 @@ function objectCollision() {
             player.position.y = walls[j].position.y - player.size;
             collisionSide = 3;
             airborn = false;
+            dustCloud();
           }
         }
       }
@@ -272,12 +354,14 @@ function objectCollision() {
             player.position.x = walls[j].position.x + walls[j].sizeB;
             collisionSide = 2;
             airborn = false;
+            dustCloud();
           }
           //IF THE PLAYER IS COMING FROM THE LEFT TO THE RIGHT OF THE SCREEN
           if (player.prevPos.x < player.position.x) {
             player.position.x = walls[j].position.x - player.size;
             collisionSide = 1;
             airborn = false;
+            dustCloud();
           }
         }
       }
@@ -294,9 +378,16 @@ function objectCollision() {
 
 //PERISH (RESET PLAYER)
 function die() {
+
+  //DEATH EXPLOSION CUBES
+  // for (let d = 0; d < 30; d++) {
+  //   miniCubes.push(new DeathCube);
+  // }
+
   collisionSide = 0;
   player.velocity = 0;
   player.position.x = 50;
   player.position.y = 50;
   airborn = false;
+
 }
