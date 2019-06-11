@@ -14,13 +14,14 @@ let wallTypes = ['norm', 'kill'];
 //VARIABLE KEEPING IN TRACK OF ALL WALLS IN THE LEVEL
 let walls = [];
 //AMOUNT OF WALLS IN THE LEVEL
-let wallNum = 10;
+let wallNum = 3;
 //WHETHER OR NOT THE PLAYER CAN JUMP
 let launchGood = true;
 //HOLDS ALL OF THE DUST
-let dusts = [];
-
+let particleArray = [];
 let wallAdd = 10;
+let noKill = false;
+let goalGot = false;
 
 //INITIAL SETUP (CANVAS, FIRST LEVEL, PLAYER, AND GOAL)
 function setup() {
@@ -42,32 +43,19 @@ function draw() {
   }
   windowWallCollsion();
   objectCollision();
-  for (let d = 0; d < dusts.length; d++) {
-    dusts[d].display();
-    dusts[d].move();
+  for (let d = 0; d < particleArray.length; d++) {
+    particleArray[d].display();
+    particleArray[d].move();
   }
   goalCheck();
-  trajectory();
+  if (airborn === false) {
+    trajectory();
+  }
 }
 
 
-function trajectory(){
-  let a = mouseX;
-  let b = player.position.x;
-  let c = lerp(a, b, 0.2);
-  let d = lerp(a, b, 0.5);
-  let e = lerp(a, b, 0.8);
-
-  let y = mouseY;
-
-  push();
-  strokeWeight(5);
-  point(b, b);
-  point(b, b);
-  point(c, y);
-  point(d, y);
-  point(e, y);
-  pop();
+function trajectory() {
+  line(player.position.x + player.size / 2, player.position.y + player.size / 2, mouseX, mouseY);
 }
 
 
@@ -162,37 +150,88 @@ class playerBox {
 }
 
 
-//DEATH EXPLOSION CUBES
+//LANDING DUST
 class DustParticle {
   constructor() {
-    this.position = createVector(0);
-    this.size = 10;
-    this.transparency = 50;
-    this.velocity = 0;
-  }
-
-  display() {
-    fill(200, 200, 200, this.transparency);
-    if (collisionSide === 4) {
-      this.position = createVector(player.position.x + player.size / 2, player.position.y);
-      ellipse(this.position.x, this.position.y, this.size, this.size);
-    }
-    if (collisionSide === 3) {
-      this.position = createVector(player.position.x + player.size / 2, player.position.y + player.size);
-      ellipse(this.position.x, this.position.y, this.size, this.size);
-    }
     if (collisionSide === 2) {
-      this.position = createVector(player.position.x, player.position.y + player.size / 2);
-      ellipse(this.position.x, this.position.y, this.size, this.size);
+      this.x = player.position.x;
+      this.y = player.position.y + player.size / 2;
     }
-    if (collisionSide === 1) {
-      this.position = createVector(player.position.x + player.size, player.position.y + player.size / 2);
-      ellipse(this.position.x, this.position.y, this.size, this.size);
+    else if (collisionSide === 1) {
+      this.x = player.position.x + player.size;
+      this.y = player.position.y + player.size / 2;
     }
+    else if (collisionSide === 4) {
+      this.x = player.position.x + player.size / 2;
+      this.y = player.position.y;
+    }
+    else if (collisionSide === 3) {
+      this.x = player.position.x + player.size / 2;
+      this.y = player.position.y + player.size;
+    }
+    else if (collisionSide === 0) {
+      this.x = player.position.x;
+      this.y = player.position.y;
+    }
+    this.transparency = 150;
+    this.size = random(10, 20);
+    this.ySpeed = random(-1, 1);
+    this.xSpeed = random(-0.5, 0.5);
+    this.lifetime = int(random(80, 160));
+    this.maxLifetime = this.lifetime;
+    this.GRAV = -0.02;
+    this.noiseLoc = random(10);
+    this.steps = 0;
   }
 
   move() {
-    this.position.x -20;
+    this.steps++;
+    this.lifetime -= 1;
+    this.ySpeed += 0;
+    this.x += (map(noise(this.noiseLoc), 0, 1, -1, 1));
+    this.noiseLoc += 0.01;
+    //this.x += this.xSpeed;
+    this.y += this.ySpeed;
+    this.floorCollision();
+    this.transparency--;
+  }
+
+  floorCollision() {
+    if (this.y > height) {
+      this.y = height;
+      this.ySpeed *= -1;
+    }
+  }
+
+  isAlive() {
+    if (this.lifetime > 0) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  display() {
+    ellipseMode(CENTER);
+    push();
+    noStroke();
+    translate(this.x, this.y);
+    scale(map(this.lifetime, 0, this.maxLifetime, 0, 1));
+    rotate(radians(this.steps * 3));
+    if (goalGot === true){
+      fill(255, 255, 0, this.transparency);
+      ellipse(0, 0, this.size, this.size);
+    }
+    else if (noKill === false) {
+      fill(150, 150, 150, this.transparency);
+      ellipse(0, 0, this.size, this.size);
+    }
+    else if (noKill === true) {
+      fill(255, 0, 0, this.transparency);
+      rect(0, 0, this.size, this.size);
+    }
+    pop();
   }
 }
 
@@ -210,39 +249,51 @@ function windowWallCollsion() {
     player.position.x = width - player.size;
     //LEFT SIDE OF WINDOW
     collisionSide = 1;
-    dustCloud();
+    noKill = false;
+    goalGot = false;
+    particles();
   }
   else if (player.position.x < 0) {
     player.position.x = 0;
     //RIGHT SIDE OF WINDOW
     collisionSide = 2;
-    dustCloud();
+    noKill = false;
+    goalGot = false;
+    particles();
   }
   else if (player.position.y + player.size > height) {
     player.position.y = height - player.size;
     //BOTTOM SIDE OF WINDOW
     collisionSide = 3;
-    dustCloud();
+    noKill = false;
+    goalGot = false;
+    particles();
   }
   else if (player.position.y < 0) {
     player.position.y = 0;
     //TOP SIDE OF WINDOW
     collisionSide = 4;
-    dustCloud();
+    noKill = false;
+    goalGot = false;
+    particles();
   }
 }
 
 
-function dustCloud() {
-  if (collisionSide > 0) {
-    for (let l = 0; l < 20; l++) {
-      dusts.push(new DustParticle);
+function particles() {
+  particleArray.length = 0;
+  if (noKill === false){
+    for (let l = 0; l < 5; l++) {
+      particleArray.push(new DustParticle);
     }
   }
-  else {
-    dusts = [];
+  else if (noKill === true){
+    for (let l = 0; l < 10; l++) {
+      particleArray.push(new DustParticle);
+    }
   }
 }
+
 
 
 //BUILD THE WALL
@@ -296,6 +347,8 @@ class Goal {
 function goalCheck() {
   goalTouch = collideRectCircle(player.position.x, player.position.y, player.size, player.size, goal.position.x, goal.position.y, goal.size, goal.size);
   if (goalTouch === true) {
+    goalGot = true;
+    particles();
     resetLevel();
   }
 }
@@ -334,14 +387,18 @@ function objectCollision() {
             player.position.y = walls[j].position.y + walls[j].sizeB;
             collisionSide = 4;
             airborn = false;
-            dustCloud();
+            noKill = false;
+            goalGot = false;
+            particles();
           }
           //IF THE PLAYER IS COMING FROM THE TOP TO THE BOTTOM OF THE SCREEN
           else if (player.prevPos.y < player.position.y) {
             player.position.y = walls[j].position.y - player.size;
             collisionSide = 3;
             airborn = false;
-            dustCloud();
+            noKill = false;
+            goalGot = false;
+            particles();
           }
         }
       }
@@ -354,14 +411,18 @@ function objectCollision() {
             player.position.x = walls[j].position.x + walls[j].sizeB;
             collisionSide = 2;
             airborn = false;
-            dustCloud();
+            noKill = false;
+            goalGot = false;
+            particles();
           }
           //IF THE PLAYER IS COMING FROM THE LEFT TO THE RIGHT OF THE SCREEN
           if (player.prevPos.x < player.position.x) {
             player.position.x = walls[j].position.x - player.size;
             collisionSide = 1;
             airborn = false;
-            dustCloud();
+            noKill = false;
+            goalGot = false;
+            particles();
           }
         }
       }
@@ -369,6 +430,9 @@ function objectCollision() {
     //KILL THE PLAYER IF THEY HIT A KILL (PURPLE) WALL
     else if (walls[j].type === 'kill') {
       if (horizontalWallHit === true && walls[j].rotation === 1 || verticalWallHit === true && walls[j].rotation === 2) {
+        noKill = true;
+        goalGot = false;
+        particles();
         die();
       }
     }
@@ -378,16 +442,9 @@ function objectCollision() {
 
 //PERISH (RESET PLAYER)
 function die() {
-
-  //DEATH EXPLOSION CUBES
-  // for (let d = 0; d < 30; d++) {
-  //   miniCubes.push(new DeathCube);
-  // }
-
   collisionSide = 0;
   player.velocity = 0;
   player.position.x = 50;
   player.position.y = 50;
   airborn = false;
-
 }
