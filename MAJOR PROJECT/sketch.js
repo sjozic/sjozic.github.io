@@ -22,6 +22,8 @@ let particleArray = [];
 let wallAdd = 10;
 let noKill = false;
 let goalGot = false;
+let forceReset = false;
+let darkMode = false;
 
 //INITIAL SETUP (CANVAS, FIRST LEVEL, PLAYER, AND GOAL)
 function setup() {
@@ -34,7 +36,12 @@ function setup() {
 
 //EVERY FRAME DO ALL OF THESE SHENANIGANS
 function draw() {
-  background(255);
+  if (darkMode === false){
+    background(255);
+  }
+  else if (darkMode === true){
+    background(0);
+  }
   player.display();
   player.move();
   goal.display();
@@ -55,7 +62,23 @@ function draw() {
 
 
 function trajectory() {
+  stroke(255);
+  if (darkMode === false){
+    stroke(0);
+  }
   line(player.position.x + player.size / 2, player.position.y + player.size / 2, mouseX, mouseY);
+  stroke(0);
+}
+
+
+function keyPressed() {
+  if (keyCode === DOWN_ARROW) {
+    forceReset = true;
+    resetLevel();
+  }
+  if (keyCode === UP_ARROW) {
+    darkMode = !darkMode;
+  }
 }
 
 
@@ -131,7 +154,10 @@ class playerBox {
   }
 
   display() {
-    fill(0);
+    fill(255);
+    if (darkMode === false){
+      fill(0);
+    }
     rect(this.position.x, this.position.y, this.size, this.size);
   }
 
@@ -219,7 +245,7 @@ class DustParticle {
     translate(this.x, this.y);
     scale(map(this.lifetime, 0, this.maxLifetime, 0, 1));
     rotate(radians(this.steps * 3));
-    if (goalGot === true){
+    if (goalGot === true) {
       fill(255, 255, 0, this.transparency);
       ellipse(0, 0, this.size, this.size);
     }
@@ -282,12 +308,12 @@ function windowWallCollsion() {
 
 function particles() {
   particleArray.length = 0;
-  if (noKill === false){
+  if (noKill === false) {
     for (let l = 0; l < 5; l++) {
       particleArray.push(new DustParticle);
     }
   }
-  else if (noKill === true){
+  else if (noKill === true) {
     for (let l = 0; l < 10; l++) {
       particleArray.push(new DustParticle);
     }
@@ -312,10 +338,10 @@ class Wall {
       fill(255, 0, 255);
     }
     else if (this.type === 'norm') {
-      fill(0);
-    }
-    else if (this.type === 'ice') {
-      fill(0, 0, 255, 150);
+      fill(255);
+      if (darkMode === false){
+        fill(0);
+      }
     }
 
     //DRAW DIFFERENT WALL ROTATION
@@ -366,8 +392,12 @@ function resetLevel() {
   player.velocity = 0;
   collisionSide = 0;
   airborn = false;
-  wallNum += wallAdd;
-  wallAdd++;
+  if (wallNum < 80 && forceReset === false) {
+    wallNum += wallAdd;
+    wallAdd++;
+  }
+  forceReset = false;
+
 }
 
 
