@@ -1,4 +1,5 @@
-// MAJOR PROJECT
+// SIMON JOZIC: MAJOR PROJECT
+//COOL FUN JUMPING BOX GAME
 
 
 //VARIABLE SHINDIGGERY
@@ -17,13 +18,21 @@ let walls = [];
 let wallNum = 3;
 //WHETHER OR NOT THE PLAYER CAN JUMP
 let launchGood = true;
-//HOLDS ALL OF THE DUST
+//HOLDS ALL OF THE PARTICLES
 let particleArray = [];
-let wallAdd = 10;
+//THE AMOUNT OF WALLS ADDED AFTER COMPLETING A LEVEL
+let wallAdd = 3;
+//USED TO KEEP TRACK WHETHER THE WALL YOU LANDED ON KILLED YOU
 let noKill = false;
+//USE TO DETECT IF THE GOAL WAS GRABBED
 let goalGot = false;
+//USED TO DETECT IF THE DOWN KEY WAS USED TO RESET THE LEVEL
 let forceReset = false;
+//KEEPS TRACK WHETHER DARK MODE IS ON OR OFF
 let darkMode = false;
+//COUNTS LEVELS COMPLETED
+let levelCount = 0;
+
 
 //INITIAL SETUP (CANVAS, FIRST LEVEL, PLAYER, AND GOAL)
 function setup() {
@@ -34,36 +43,65 @@ function setup() {
   resetLevel();
 }
 
+
 //EVERY FRAME DO ALL OF THESE SHENANIGANS
 function draw() {
-  if (darkMode === false){
+  //CHECK DARK MODE
+  if (darkMode === false) {
     background(255);
   }
-  else if (darkMode === true){
+  else if (darkMode === true) {
     background(0);
   }
+
+  //DISPLAY OBJECTS
   player.display();
   player.move();
   goal.display();
   for (let i = 0; i < walls.length; i++) {
     walls[i].display();
   }
-  windowWallCollsion();
-  objectCollision();
   for (let d = 0; d < particleArray.length; d++) {
     particleArray[d].display();
     particleArray[d].move();
   }
+
+  //EVERY FRAME CHECK COLLISIONS
+  windowWallCollsion();
+  objectCollision();
+
+  //EVERY FRAME CHECK FOR THE GOAL
   goalCheck();
+
+  //EVERY FRAME DRAW THE ANGLE PREDICTOR
   if (airborn === false) {
     trajectory();
   }
+
+  //ON SCREEN TEXT
+  push();
+  noStroke();
+  fill(50, 50, 50);
+  if (darkMode === false) {
+    fill(0, 0, 0, 50);
+  }
+  //FIRST LEVEL TUTORIAL
+  if (levelCount === 1) {
+    text('Up Arrow: Dark Mode', width - 120, 45);
+    text('Down Arrow: Reset Level', width - 140, 45 / 2);
+  }
+  //LEVEL COUNTER
+  textSize(50);
+  text(str(levelCount), 0, 40);
+
+  pop();
 }
 
 
+//DRAWS THE ANGLE PREDICTOR LINE
 function trajectory() {
   stroke(255);
-  if (darkMode === false){
+  if (darkMode === false) {
     stroke(0);
   }
   line(player.position.x + player.size / 2, player.position.y + player.size / 2, mouseX, mouseY);
@@ -71,6 +109,7 @@ function trajectory() {
 }
 
 
+//USED TO TOGGLE DARK MODE AND FORCE RESET LEVELS
 function keyPressed() {
   if (keyCode === DOWN_ARROW) {
     forceReset = true;
@@ -155,7 +194,7 @@ class playerBox {
 
   display() {
     fill(255);
-    if (darkMode === false){
+    if (darkMode === false) {
       fill(0);
     }
     rect(this.position.x, this.position.y, this.size, this.size);
@@ -179,6 +218,7 @@ class playerBox {
 //LANDING DUST
 class DustParticle {
   constructor() {
+    //SETS POSITION BASED ON WHAT SIDE COLLIDED
     if (collisionSide === 2) {
       this.x = player.position.x;
       this.y = player.position.y + player.size / 2;
@@ -216,7 +256,6 @@ class DustParticle {
     this.ySpeed += 0;
     this.x += (map(noise(this.noiseLoc), 0, 1, -1, 1));
     this.noiseLoc += 0.01;
-    //this.x += this.xSpeed;
     this.y += this.ySpeed;
     this.floorCollision();
     this.transparency--;
@@ -245,14 +284,17 @@ class DustParticle {
     translate(this.x, this.y);
     scale(map(this.lifetime, 0, this.maxLifetime, 0, 1));
     rotate(radians(this.steps * 3));
+    //IF GOAL WAS GOTTEN, DISPLAY YELLOW CIRCLES
     if (goalGot === true) {
       fill(255, 255, 0, this.transparency);
       ellipse(0, 0, this.size, this.size);
     }
+    //IF THE WALL DIDNT KILL YOU, DISPLAY DUST
     else if (noKill === false) {
       fill(150, 150, 150, this.transparency);
       ellipse(0, 0, this.size, this.size);
     }
+    //IF THE WALL DID KILL YOU, DISPLAY DEATH PARTICLE
     else if (noKill === true) {
       fill(255, 0, 0, this.transparency);
       rect(0, 0, this.size, this.size);
@@ -313,6 +355,7 @@ function particles() {
       particleArray.push(new DustParticle);
     }
   }
+  //ADD MORE DEATH PARTICLES THAN DUST PARTICLES
   else if (noKill === true) {
     for (let l = 0; l < 10; l++) {
       particleArray.push(new DustParticle);
@@ -339,7 +382,7 @@ class Wall {
     }
     else if (this.type === 'norm') {
       fill(255);
-      if (darkMode === false){
+      if (darkMode === false) {
         fill(0);
       }
     }
@@ -392,6 +435,9 @@ function resetLevel() {
   player.velocity = 0;
   collisionSide = 0;
   airborn = false;
+  if (forceReset === false) {
+    levelCount++;
+  }
   if (wallNum < 80 && forceReset === false) {
     wallNum += wallAdd;
     wallAdd++;
